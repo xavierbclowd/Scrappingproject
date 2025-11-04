@@ -76,14 +76,5 @@ scrapoxy
 scrapy-rotating-proxies
 scrapeops_scrapy
 scrapy-inline-requests
-cloudscraper
-urljoin
-urlencoder
-tldextract
-aiohttp
-asyncio
-webcolors==1.11.1
-nest_asyncio
-
 
 

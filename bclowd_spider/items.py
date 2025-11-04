@@ -5,12 +5,12 @@
 
 import scrapy
 
+
 class ProductItem(scrapy.Item):
     date = scrapy.Field()
     domain = scrapy.Field()
     domain_url = scrapy.Field()
     collection_name = scrapy.Field()
-    season = scrapy.Field()
     brand = scrapy.Field()
     product_badge = scrapy.Field()
     manufacturer = scrapy.Field()
@@ -29,5 +29,5 @@ class ProductItem(scrapy.Item):
     image_url = scrapy.Field()
     specification = scrapy.Field()
     content = scrapy.Field()
-    tags = scrapy.Field()         # New field for tags
-    categories = scrapy.Field()   # New field for categories
+    tags = scrapy.Field()  # New field for tags
+    categories = scrapy.Field()  # New field for categories

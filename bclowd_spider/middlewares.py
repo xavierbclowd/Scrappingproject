@@ -4,6 +4,7 @@
 # https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
 from scrapy import signals
+
 # from scrapy.downloadermiddlewares.retry import RetryMiddleware
 # from scrapy.utils.response import response_status_message
 # import time
@@ -12,6 +13,7 @@ from scrapy import signals
 from itemadapter import is_item, ItemAdapter
 from random import randint
 from .settings import rotate_headers
+
 
 class RotateUserAgentMiddleware:
     def process_request(self, request, spider):
@@ -62,7 +64,25 @@ class BclowdSpiderSpiderMiddleware:
             yield r
 
     def spider_opened(self, spider):
-        spider.logger.info('Spider opened: %s' % spider.name)
+        spider.logger.info("Spider opened: %s" % spider.name)
+
+
+class ZenRowsDownloaderMiddleware:
+    """Custom middleware to handle ZenRows requests"""
+
+    def process_request(self, request, spider):
+        if request.meta.get("skip_scrapy_download"):
+            # Return a fake response to trigger the callback
+            from scrapy.http.response.html import HtmlResponse
+
+            fake_response = HtmlResponse(
+                url=request.url,
+                status=200,
+                body=b"{}",  # Empty JSON body
+                encoding="utf-8",
+            )
+            return fake_response
+        return None
 
 
 class BclowdSpiderDownloaderMiddleware:
@@ -120,7 +140,7 @@ class BclowdSpiderDownloaderMiddleware:
     #         elif response.status in self.retry_http_codes:
     #             reason = response_status_message(response.status)
     #             return self._retry(request, reason, spider) or response
-    #         return response 
-    
+    #         return response
+
     def spider_opened(self, spider):
-        spider.logger.info('Spider opened: %s' % spider.name)
+        spider.logger.info("Spider opened: %s" % spider.name)

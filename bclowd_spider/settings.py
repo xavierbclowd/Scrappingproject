@@ -6,6 +6,18 @@
 #     https://docs.scrapy.org/en/latest/topics/settings.html
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
+
+import sys
+import asyncio
+
+if sys.platform == "win32":
+    # en Windows, cambia a SelectorEventLoop
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
+from twisted.internet import asyncioreactor
+
+asyncioreactor.install()
+
 from random import randint
 import requests, os, cloudscraper
 from azure.storage.blob import (
@@ -20,10 +32,10 @@ from datetime import datetime, timedelta
 from itertools import cycle
 
 
-BOT_NAME = 'bclowd_spider'
+BOT_NAME = "bclowd_spider"
 
-SPIDER_MODULES = ['bclowd_spider.spiders']
-NEWSPIDER_MODULE = 'bclowd_spider.spiders'
+SPIDER_MODULES = ["bclowd_spider.spiders"]
+NEWSPIDER_MODULE = "bclowd_spider.spiders"
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 # USER_AGENT = 'bclowd_spider (+http://www.yourdomain.com)'
@@ -37,7 +49,7 @@ CONCURRENT_REQUESTS = 10
 # Configure a delay for requests for the same website (default: 0)
 # See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-# DOWNLOAD_DELAY = 2  # A slight delay to prevent hitting server limits
+DOWNLOAD_DELAY = 1  # A slight delay to prevent hitting server limits
 # The download delay setting will honor only one of:
 CONCURRENT_REQUESTS_PER_DOMAIN = 10
 CONCURRENT_REQUESTS_PER_IP = 10
@@ -45,8 +57,7 @@ CONCURRENT_REQUESTS_PER_IP = 10
 # RETRY_PRIORITY_ADJUST = -1
 
 # Disable cookies (enabled by default)
-COOKIES_ENABLED = True
-
+COOKIES_ENABLED = False
 # Disable Telnet Console (enabled by default)
 # TELNETCONSOLE_ENABLED = False
 # Set settings whose default value is deprecated to a future-proof value
@@ -61,142 +72,98 @@ REQUEST_FINGERPRINTER_IMPLEMENTATION = "2.7"
 # Enable or disable spider middlewares
 # See https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 # SPIDER_MIDDLEWARES = {
-#    'bclowd_spider.middlewares.BclowdSpiderSpiderMiddleware': 543,
+#   'bclowd_spider.middlewares.BclowdSpiderSpiderMiddleware': 543,
+# "scrapy_zyte_api.ScrapyZyteAPISpiderMiddleware": 100,
+# "scrapy_zyte_api.ScrapyZyteAPIRefererSpiderMiddleware": 1000,
 # }
 DNS_RESOLVER = "scrapy.resolver.CachingHostnameResolver"
 DOWNLOAD_HANDLERS = {
+    # "http": "scrapy_zyte_api.ScrapyZyteAPIDownloadHandler",
+    # "https": "scrapy_zyte_api.ScrapyZyteAPIDownloadHandler",
     "https": "scrapy.core.downloader.handlers.http.HTTPDownloadHandler"
 }
+
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
+
+
 DOWNLOADER_MIDDLEWARES = {
-    
-    # 'scrapoxy.ProxyDownloaderMiddleware': 100,
-    # 'scrapoxy.BlacklistDownloaderMiddleware': 101,
-    'bclowd_spider.middlewares.RotateUserAgentMiddleware': 400,
-    'rotating_proxies.middlewares.RotatingProxyMiddleware': 610,
-    'rotating_proxies.middlewares.BanDetectionMiddleware': 620,
-    # 'scrapeops_scrapy.middleware.retry.RetryMiddleware': 550,      
-    'scrapy.downloadermiddlewares.retry.RetryMiddleware': 550,
-    'bclowd_spider.middlewares.BclowdSpiderDownloaderMiddleware': 543,   
+    # 'bclowd_spider.middlewares.RotateUserAgentMiddleware': 400,
+    "rotating_proxies.middlewares.RotatingProxyMiddleware": 610,
+    "rotating_proxies.middlewares.BanDetectionMiddleware": 620,
+    "scrapeops_scrapy.middleware.retry.RetryMiddleware": 550,
+    # 'scrapy.downloadermiddlewares.retry.RetryMiddleware': None,
+    "scrapy.downloadermiddlewares.redirect.MetaRefreshMiddleware": None,
+    "scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware": 750,
+    "scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware": 810,
+    "bclowd_spider.middlewares.BclowdSpiderDownloaderMiddleware": 543,
 }
 
 ## Insert Your List of Proxies Here
 ROTATING_PROXY_LIST = [
-    # 'private.residential.proxyrack.net:10000',
-    # 'private.residential.proxyrack.net:10001',
-    'p.webshare.io:10000',
-    'p.webshare.io:10001',
-    'p.webshare.io:10002',
-    'p.webshare.io:10003',
-    'p.webshare.io:10004',
-    'p.webshare.io:10005',
-    'p.webshare.io:10006',
-    'p.webshare.io:10007',
-    'p.webshare.io:10008',
-    'p.webshare.io:10009',
-    'p.webshare.io:10010',
-    'p.webshare.io:10011',
-    'p.webshare.io:10012',
-    'p.webshare.io:10013',
-    'p.webshare.io:10014',
-    'p.webshare.io:10015',
-    'p.webshare.io:10016',
-    'p.webshare.io:10017',
-    'p.webshare.io:10018'
-    # 'p.webshare.io:10019'
-    # 'p.webshare.io:10020',
-    # 'p.webshare.io:10021',
-    # 'p.webshare.io:10022',
-    # 'p.webshare.io:10023',
-    # 'p.webshare.io:10024',
-    # 'p.webshare.io:10025',
-    # 'p.webshare.io:10026',
-    # 'p.webshare.io:10027',
-    # 'p.webshare.io:10028',
-    # 'p.webshare.io:10029',
-    # 'p.webshare.io:10030',
-    # 'p.webshare.io:10031',
-    # 'p.webshare.io:10032',
-    # 'p.webshare.io:10033',
-    # 'p.webshare.io:10034',
-    # 'p.webshare.io:10035',
-    # 'p.webshare.io:10036',
-    # 'p.webshare.io:10037',
-    # 'p.webshare.io:10038',
-    # 'p.webshare.io:10039',
-    # 'p.webshare.io:10040',
-    # 'p.webshare.io:10041',
-    # 'p.webshare.io:10042',
-    # 'p.webshare.io:10043',
-    # 'p.webshare.io:10044',
-    # 'p.webshare.io:10045',
-    # 'p.webshare.io:10046',
-    # 'p.webshare.io:10047',
-    # 'p.webshare.io:10048',
-    # 'p.webshare.io:10049',
-    # 'p.webshare.io:10050',
-    # 'p.webshare.io:10051',
-    # 'p.webshare.io:10052',
-    # 'p.webshare.io:10053',
-    # 'p.webshare.io:10054',
-    # 'p.webshare.io:10055',
-    # 'p.webshare.io:10056',
-    # 'p.webshare.io:10057',
-    # 'p.webshare.io:10058',
-    # 'p.webshare.io:10059',
-    # 'p.webshare.io:10060',
-    # 'p.webshare.io:10061',
-    # 'p.webshare.io:10062',
-    # 'p.webshare.io:10063',
-    # 'p.webshare.io:10064',
-    # 'p.webshare.io:10065',
-    # 'p.webshare.io:10066',
-    # 'p.webshare.io:10067',
-    # 'p.webshare.io:10068',
-    # 'p.webshare.io:10069',
-    # 'p.webshare.io:10070',
-    # 'p.webshare.io:10071',
-    # 'p.webshare.io:10072',
-    # 'p.webshare.io:10073',
-    # 'p.webshare.io:10074'
+    # RESIDENTIAL
+    "4qTGjgRBM8zDYP7e:WrENZmJ2VxRmM1Fz_country-es_streaming-1@geo.iproyal.com:12321",
+    "4qTGjgRBM8zDYP7e:WrENZmJ2VxRmM1Fz_country-es_streaming-1@geo.iproyal.com:12321",
+    "4qTGjgRBM8zDYP7e:WrENZmJ2VxRmM1Fz_country-es_streaming-1@geo.iproyal.com:12321",
+    "4qTGjgRBM8zDYP7e:WrENZmJ2VxRmM1Fz_country-es_streaming-1@geo.iproyal.com:12321",
+    "4qTGjgRBM8zDYP7e:WrENZmJ2VxRmM1Fz_country-es_streaming-1@geo.iproyal.com:12321",
+    "4qTGjgRBM8zDYP7e:WrENZmJ2VxRmM1Fz_country-es_streaming-1@geo.iproyal.com:12321",
+    "4qTGjgRBM8zDYP7e:WrENZmJ2VxRmM1Fz_country-es_streaming-1@geo.iproyal.com:12321",
+    "4qTGjgRBM8zDYP7e:WrENZmJ2VxRmM1Fz_country-es_streaming-1@geo.iproyal.com:12321",
+    "4qTGjgRBM8zDYP7e:WrENZmJ2VxRmM1Fz_country-es_streaming-1@geo.iproyal.com:12321",
+    "4qTGjgRBM8zDYP7e:WrENZmJ2VxRmM1Fz_country-es_streaming-1@geo.iproyal.com:12321",
+    "4qTGjgRBM8zDYP7e:WrENZmJ2VxRmM1Fz_country-es_streaming-1@geo.iproyal.com:12321",
+    "4qTGjgRBM8zDYP7e:WrENZmJ2VxRmM1Fz_country-es_streaming-1@geo.iproyal.com:12321",
+    "4qTGjgRBM8zDYP7e:WrENZmJ2VxRmM1Fz_country-es_streaming-1@geo.iproyal.com:12321",
+    "4qTGjgRBM8zDYP7e:WrENZmJ2VxRmM1Fz_country-es_streaming-1@geo.iproyal.com:12321",
+    "4qTGjgRBM8zDYP7e:WrENZmJ2VxRmM1Fz_country-es_streaming-1@geo.iproyal.com:12321",
+    "4qTGjgRBM8zDYP7e:WrENZmJ2VxRmM1Fz_country-es_streaming-1@geo.iproyal.com:12321",
+    "4qTGjgRBM8zDYP7e:WrENZmJ2VxRmM1Fz_country-es_streaming-1@geo.iproyal.com:12321",
+    "4qTGjgRBM8zDYP7e:WrENZmJ2VxRmM1Fz_country-es_streaming-1@geo.iproyal.com:12321",
+    "4qTGjgRBM8zDYP7e:WrENZmJ2VxRmM1Fz_country-es_streaming-1@geo.iproyal.com:12321",
+    "4qTGjgRBM8zDYP7e:WrENZmJ2VxRmM1Fz_country-es_streaming-1@geo.iproyal.com:12321",
+    "4qTGjgRBM8zDYP7e:WrENZmJ2VxRmM1Fz_country-es_streaming-1@geo.iproyal.com:12321",
+    "4qTGjgRBM8zDYP7e:WrENZmJ2VxRmM1Fz_country-es_streaming-1@geo.iproyal.com:12321",
+    "4qTGjgRBM8zDYP7e:WrENZmJ2VxRmM1Fz_country-es_streaming-1@geo.iproyal.com:12321",
+    "4qTGjgRBM8zDYP7e:WrENZmJ2VxRmM1Fz_country-es_streaming-1@geo.iproyal.com:12321",
+    "4qTGjgRBM8zDYP7e:WrENZmJ2VxRmM1Fz_country-es_streaming-1@geo.iproyal.com:12321",
+    # ISP PROXIES
+    # '14a6d6cc4fd4b:da7bd0ee15@46.34.43.122:12323',
+    # '14a6d6cc4fd4b:da7bd0ee15@46.34.43.71:12323',
+    # '14a6d6cc4fd4b:da7bd0ee15@213.220.28.42:12323',
+    # '14a6d6cc4fd4b:da7bd0ee15@217.67.74.137:12323',
+    # '14a6d6cc4fd4b:da7bd0ee15@46.34.38.119:12323',
+    # '14af52412b242:63959f94c6@149.18.82.200:12323',
+    # '14af52412b242:63959f94c6@92.113.6.138:12323',
+    # '14af52412b242:63959f94c6@168.158.59.144:12323',
+    # '14af52412b242:63959f94c6@95.214.38.253:12323',
+    # '14af52412b242:63959f94c6@154.6.178.230:12323',
 ]
 
-# RESIDENTIAL_PROXIES = [
-#     "http://p.webshare.io:9999"
-# ]
-
-proxy_cycle = cycle(ROTATING_PROXY_LIST)
 # Configure which HTTP response codes should trigger a retry
 # RETRY_HTTP_CODES = [403, 500, 443, 502, 503, 504, 522, 524, 429, 408] #400 404
 RETRY_HTTP_CODES = [500, 502, 503, 504, 522, 524, 429, 408]
 
 # Configure the maximum number of times Scrapy will retry a request
-RETRY_TIMES = 10  # Adjust this value based on your needs
-DOWNLOAD_TIMEOUT = 30  # Lower the timeout to quickly drop slow responses.
-ROTATING_PROXY_PAGE_RETRY_TIMES = 10  # number of times to retry downloading a page using a different proxy. After this amount of retries failure is considered a page failure, not a proxy failure.
-ROTATING_PROXY_CLOSE_SPIDER = False   # When True, spider is stopped if there are no alive proxies. If False (default), then when there is no alive proxies all dead proxies are re-checked.
+RETRY_TIMES = 3  # Adjust this value based on your needs
+DOWNLOAD_TIMEOUT = 10  # Lower the timeout to quickly drop slow responses.
+ROTATING_PROXY_PAGE_RETRY_TIMES = 5  # number of times to retry downloading a page using a different proxy. After this amount of retries failure is considered a page failure, not a proxy failure.
+ROTATING_PROXY_CLOSE_SPIDER = False  # When True, spider is stopped if there are no alive proxies. If False (default), then when there is no alive proxies all dead proxies are re-checked.
 
-# #SCRAPOXY PROXIES MONITORING
-# SCRAPOXY_MASTER = "http://localhost:8888"
-# SCRAPOXY_API = "http://localhost:8890/api"
-# SCRAPOXY_USERNAME = "vpk2vtc1f8ryswv1042s"
-# SCRAPOXY_PASSWORD = "8lvtl4nv8z5t7n927qci9"
-# SCRAPOXY_BLACKLIST_HTTP_STATUS_CODES = [400, 429, 500, 503]
-# SCRAPOXY_SLEEP_MIN = 60
-# SCRAPOXY_SLEEP_MAX = 180
+# SCRAPEOPS SPIDER MONITORING
+SCRAPEOPS_API_KEY = "14ccef20-012f-43a1-8ef9-b812d433f537"
 
 # Enable or disable extensions
 # See https://docs.scrapy.org/en/latest/topics/extensions.html
 EXTENSIONS = {
-        'scrapeops_scrapy.extension.ScrapeOpsMonitor': 500, 
-        }
+    "scrapeops_scrapy.extension.ScrapeOpsMonitor": 500,
+}
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'bclowd_spider.pipelines.AzureImageUploadPipeline': 300,
-    'bclowd_spider.pipelines.BclowdSpiderPipeline': 400,
+    "bclowd_spider.pipelines.AzureImageUploadPipeline": 300,
+    "bclowd_spider.pipelines.BclowdSpiderPipeline": 400,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -210,7 +177,7 @@ AUTOTHROTTLE_MAX_DELAY = 60
 # each remote server
 AUTOTHROTTLE_TARGET_CONCURRENCY = 4
 # Enable showing throttling stats for every response received:
-#AUTOTHROTTLE_DEBUG = True
+# AUTOTHROTTLE_DEBUG = True
 
 # Enable and configure HTTP caching (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html#httpcache-middleware-settings
@@ -249,171 +216,147 @@ USER_AGENTS = [
     "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36",
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36 OPR/78.0.4093.147",
     "Mozilla/5.0 (X11; Fedora; Linux x86_64; rv:92.0) Gecko/20100101 Firefox/92.0",
-    "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36"
+    "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36",
 ]
 
-### local logging
-# current_path = os.path.dirname(os.path.realpath(__file__))
-# FILE_PATH = os.path.dirname(os.path.dirname(current_path)) + "/logs"
-FILE_PATH = '/tmporal/scrapy-bclowd_new/'
-
-# IS_PRODUCTION = False
-IS_PRODUCTION = False
-AZURE_BLOB_ACCOUNT_NAME = 'datastorage'
-AZURE_BLOB_ACCOUNT_KEY = 'AAk1I/iqSozCHHx""fBeN5zWukxjQC+ssKwUaougFTm0/NkeWzRjWYqbdqngfzjrse/DdHiXKGmCKYRRzNk+ASt3LpANg=='
-AZURE_BLOB_CONTAINER_NAME = 'crawlingimages'
+FILE_PATH = "/tmp/scrapy-bclowd/"
+IS_PRODUCTION = True
+AZURE_BLOB_ACCOUNT_NAME = "bclowddatastorage"
+AZURE_BLOB_ACCOUNT_KEY = "AAk1I/iqSozCkHHxfBeN5zukxjQC+KwUaougFTm0/NkeWzRjWYqbdqngfzjrse/DdHiXKGmCKYRRzNk+ASt3LpANg=="
+AZURE_BLOB_CONTAINER_NAME = "crawlingimages"
 AZURE_BLOB_MAX_CHUNK_SIZE = 4 * 1024 * 1024
 
 # CosmosDB (DocumentDB) Configuration
 # DOCDB_HOST = 'https://127.0.0.1:8081'
-DOCDB_HOST = 'https://localhost:8081'
-DOCDB_DB = 'bclowddb'
-DOCDB_COLLECTION = 'ROCK03'
-DOCDB_MASTER_KEY = 'C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw=='
+DOCDB_HOST = "https://localhost:8081"
+DOCDB_DB = "bclowddb"
+DOCDB_COLLECTION = "COACH_TEST_NEW_03"
+DOCDB_MASTER_KEY = "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw=="
 
 
-# def upload_images_to_azure_blob_storage(self, imag_urls):
-#     blob_service_client = BlobServiceClient(
-#         account_url=f"https://{AZURE_BLOB_ACCOUNT_NAME}.blob.core.windows.net/", credential=AZURE_BLOB_ACCOUNT_KEY
-#     )
-#     container_client = blob_service_client.get_container_client(AZURE_BLOB_CONTAINER_NAME)
-#     image_paths = []
-#     image_data = ''
-#     for image_url in imag_urls:
-#         if image_url:
-#             try:
-#                 if not image_url or image_url == "N/A" or image_url == "":
-#                     continue
-#                 proxy = next(proxy_cycle)
-#                 scraper = cloudscraper.create_scraper()
-#                 response = scraper.get(image_url, headers=headers, proxies={'http': proxy, 'https': proxy})
-#                 if response.status_code != 200:
-#                     print(
-#                         f"Failed to get Image: {image_url} - Status code: {response.status_code}"
-#                     )
-#                     continue
-#                 image_data = BytesIO(response.content)
+def upload_images_to_azure_blob_storage(self, imag_urls, use_zyte=False):
+    blob_service_client = BlobServiceClient(
+        account_url=f"https://{AZURE_BLOB_ACCOUNT_NAME}.blob.core.windows.net/",
+        credential=AZURE_BLOB_ACCOUNT_KEY,
+    )
+    container_client = blob_service_client.get_container_client(
+        AZURE_BLOB_CONTAINER_NAME
+    )
+    image_paths = []
 
-#             except Exception as e:
-#                 print(e)
+    for image_url in imag_urls:
+        if not image_url or image_url == "N/A" or image_url == "":
+            continue
 
-#             image_name = os.path.basename(image_url).split("?")[0]
-#             # Create a blob client
-#             blob_client = container_client.get_blob_client(blob=image_name)
+        # Add https: if missing from URL
+        if image_url.startswith("//"):
+            image_url = "https:" + image_url
 
-#             # Upload the file in chunks
-#             if not blob_client.exists():
-#                 file_size = len(image_data.getbuffer())
-#                 upload_offset = 0
-#                 while upload_offset < file_size:
-#                     chunk_data = image_data.read(AZURE_BLOB_MAX_CHUNK_SIZE)
-#                     chunk_size = len(chunk_data)
-#                     blob_client.upload_blob(
-#                         chunk_data, length=chunk_size, max_concurrency=4
-#                     )
-#                     upload_offset += chunk_size
-#             else:
-#                 print(
-#                     f"Resource by blob {image_name} Already exists. Moving to next..."
-#                 )
+        try:
+            if use_zyte:
+                # Use Zyte API for downloading images via direct API call
+                import requests
 
-#             content_settings = ContentSettings(
-#                 content_type=response.headers.get("Content-Type")
-#             )
-#             blob_client.set_http_headers(content_settings=content_settings)
-#             if blob_client.exists():
-#                 print(
-#                     f"The blob {image_name} was uploaded successfully to Azure Blob Storage!"
-#                 )
+                zyte_api_key = "67deeec4a8c641c488f63adb54fa512c"
 
-#                 sas_expiry = datetime.utcnow() + timedelta(
-#                     days=365
-#                 )  # Expiry time for the SAS URL
-#                 sas_permissions = BlobSasPermissions(read=True)
-#                 sas_token = generate_blob_sas(
-#                     account_name=AZURE_BLOB_ACCOUNT_NAME,
-#                     account_key=AZURE_BLOB_ACCOUNT_KEY,
-#                     container_name=AZURE_BLOB_CONTAINER_NAME,
-#                     blob_name=image_name,
-#                     permission=sas_permissions,
-#                     expiry=sas_expiry,
-#                 )
-#                 sas_url = blob_client.url  # + '?' + sas_token # SAS url
-#                 image_url = sas_url
-#                 image_paths.append(image_url)
-#             else:
-#                 print(
-#                     f"There was an error uploading the blob {image_name} to Azure Blob Storage."
-#                 )
-#         else:
-#             break
-#     return image_paths
+                payload = {
+                    "url": image_url,
+                    "httpResponseBody": True,
+                    "httpResponseHeaders": True,
+                }
 
-def upload_images_to_azure_blob_storage(self, imag_urls):
-   blob_service_client = BlobServiceClient(
-       account_url=f"https://{AZURE_BLOB_ACCOUNT_NAME}.blob.core.windows.net/", 
-       credential=AZURE_BLOB_ACCOUNT_KEY
-   )
-   container_client = blob_service_client.get_container_client(AZURE_BLOB_CONTAINER_NAME)
-   image_paths = []
-   
-   for image_url in imag_urls:
-       if not image_url or image_url == "N/A" or image_url == "":
-           continue
+                zyte_response = requests.post(
+                    "https://api.zyte.com/v1/extract",
+                    json=payload,
+                    auth=(zyte_api_key, ""),
+                    timeout=30,
+                )
 
-       # Add https: if missing from URL
-       if image_url.startswith('//'):
-           image_url = 'https:' + image_url
-           
-       try:
-           proxy = next(proxy_cycle)
-           scraper = cloudscraper.create_scraper()
-           response = scraper.get(image_url, headers=headers, proxies={'http': proxy, 'https': proxy})
-           
-           if response.status_code != 200:
-               print(f"Failed to get Image: {image_url} - Status code: {response.status_code}")
-               continue
-               
-           image_data = BytesIO(response.content)
-           image_name = os.path.basename(image_url).split("?")[0]
-           blob_client = container_client.get_blob_client(blob=image_name)
+                if zyte_response.status_code == 200:
+                    zyte_data = zyte_response.json()
 
-           if not blob_client.exists():
-               file_size = len(image_data.getbuffer())
-               upload_offset = 0
-               while upload_offset < file_size:
-                   chunk_data = image_data.read(AZURE_BLOB_MAX_CHUNK_SIZE)
-                   chunk_size = len(chunk_data)
-                   blob_client.upload_blob(chunk_data, length=chunk_size, max_concurrency=4)
-                   upload_offset += chunk_size
-           else:
-               print(f"Resource by blob {image_name} Already exists. Moving to next...")
+                    # Create a mock response object
+                    class MockResponse:
+                        def __init__(self, content, status_code, headers):
+                            self.content = content
+                            self.status_code = status_code
+                            self.headers = headers
 
-           content_settings = ContentSettings(content_type=response.headers.get("Content-Type"))
-           blob_client.set_http_headers(content_settings=content_settings)
-           
-           if blob_client.exists():
-               print(f"The blob {image_name} was uploaded successfully to Azure Blob Storage!")
-               sas_expiry = datetime.now() + timedelta(days=365*1000)
-               sas_permissions = BlobSasPermissions(read=True)
-               sas_token = generate_blob_sas(
-                   account_name=AZURE_BLOB_ACCOUNT_NAME,
-                   account_key=AZURE_BLOB_ACCOUNT_KEY,
-                   container_name=AZURE_BLOB_CONTAINER_NAME,
-                   blob_name=image_name,
-                   permission=sas_permissions,
-                   expiry=sas_expiry,
-               )
-               image_url = blob_client.url
-               image_paths.append(image_url)
-           else:
-               print(f"There was an error uploading the blob {image_name} to Azure Blob Storage.")
+                    # Decode base64 content
+                    import base64
 
-       except Exception as e:
-           print(f"Error processing {image_url}: {e}")
-           continue
+                    image_content = base64.b64decode(zyte_data["httpResponseBody"])
+                    response_headers = zyte_data.get("httpResponseHeaders", {})
 
-   return image_paths
+                    response = MockResponse(image_content, 200, response_headers)
+                else:
+                    print(
+                        f"Zyte API failed for {image_url}, falling back to regular download"
+                    )
+                    scraper = cloudscraper.create_scraper()
+                    response = scraper.get(image_url, headers=headers)
+            else:
+                # Use regular cloudscraper
+                scraper = cloudscraper.create_scraper()
+                response = scraper.get(image_url, headers=headers)
+
+            if response.status_code != 200:
+                print(
+                    f"Failed to get Image: {image_url} - Status code: {response.status_code}"
+                )
+                continue
+
+            image_data = BytesIO(response.content)
+            image_name = os.path.basename(image_url).split("?")[0]
+            blob_client = container_client.get_blob_client(blob=image_name)
+
+            if not blob_client.exists():
+                file_size = len(image_data.getbuffer())
+                upload_offset = 0
+                while upload_offset < file_size:
+                    chunk_data = image_data.read(AZURE_BLOB_MAX_CHUNK_SIZE)
+                    chunk_size = len(chunk_data)
+                    blob_client.upload_blob(
+                        chunk_data, length=chunk_size, max_concurrency=4
+                    )
+                    upload_offset += chunk_size
+            else:
+                print(
+                    f"Resource by blob {image_name} Already exists. Moving to next..."
+                )
+
+            content_settings = ContentSettings(
+                content_type=response.headers.get("Content-Type")
+            )
+            blob_client.set_http_headers(content_settings=content_settings)
+
+            if blob_client.exists():
+                print(
+                    f"The blob {image_name} was uploaded successfully to Azure Blob Storage!"
+                )
+                sas_expiry = datetime.now() + timedelta(days=365 * 1000)
+                sas_permissions = BlobSasPermissions(read=True)
+                sas_token = generate_blob_sas(
+                    account_name=AZURE_BLOB_ACCOUNT_NAME,
+                    account_key=AZURE_BLOB_ACCOUNT_KEY,
+                    container_name=AZURE_BLOB_CONTAINER_NAME,
+                    blob_name=image_name,
+                    permission=sas_permissions,
+                    expiry=sas_expiry,
+                )
+                image_url = blob_client.url
+                image_paths.append(image_url)
+            else:
+                print(
+                    f"There was an error uploading the blob {image_name} to Azure Blob Storage."
+                )
+
+        except Exception as e:
+            print(f"Error processing {image_url}: {e}")
+            continue
+
+    return image_paths
+
 
 def rotate_headers():
     HEADERS["user-agent"] = USER_AGENTS[randint(0, len(USER_AGENTS) - 1)]
